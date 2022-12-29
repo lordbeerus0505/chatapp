@@ -1,12 +1,14 @@
 import {useForm} from "react-hook-form"
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup"
 import {yupResolver} from "@hookform/resolvers/yup"
 import axios from "axios";
-import { HOSTNAME } from ".."
+import { cookies, HOSTNAME } from ".."
 import { useState } from "react";
 
 export const Register = () => {
-    const [status, setStatus] = useState(false)
+    const [status, setStatus] = useState(false);
+    let navigate = useNavigate(); 
     const schema = yup.object().shape({
         fname: yup.string().required(),
         lname: yup.string().required(), 
@@ -22,14 +24,21 @@ export const Register = () => {
         const res = axios.post(HOSTNAME+'/register', credentials)
             .then(
                 (resp) =>{
-                    (resp.data) ? setStatus(true) : setStatus(false)
+                    if (resp.data) {
+                        // Set the cookie state
+                        cookies.set('email', credentials.email, {path: '/'}) // so that its visible in all pages
+                        cookies.set('firstname', credentials.firstname, {path: '/'})
+                        cookies.set('lastname', credentials.lastname, {path: '/'})
+                        navigate("/chat")
+                    } else {
+                        alert("Account already exists, use a different email address")
+                    }
                 });
-        console.log(status, "is the status from payload")   
     }
 
     return (
         <div>
-            <h1>This is the Login Page</h1>
+            <h1>This is the Registration Page</h1>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <input type="text" placeholder="First Name" {...register("fname")}/> <br/>
                 <p>{errors.fname?.message}</p>

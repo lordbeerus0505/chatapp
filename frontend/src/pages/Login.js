@@ -3,10 +3,13 @@ import * as yup from "yup"
 import {yupResolver} from "@hookform/resolvers/yup"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { HOSTNAME } from "..";
+import { HOSTNAME, cookies } from "..";
+import { useState } from "react";
+
 
 
 export const Login = () => {
+    const [status, setStatus] = useState(false)
     let navigate = useNavigate(); 
     const schema = yup.object().shape({
         email: yup.string().email('Invalid Email Address').required(),
@@ -15,12 +18,24 @@ export const Login = () => {
     const {register, handleSubmit, formState: {errors}} = useForm({
         resolver: yupResolver(schema)
     });
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
         // Send data to go backend
 
         const credentials = { email: data.email, password: data.pwd };
-        const res = axios.post(HOSTNAME+'/login', credentials);
-        console.log(res)
+        const res = await axios.post(HOSTNAME+'/login', credentials)
+            .then(
+                (resp) =>{
+                    console.log(resp.data)
+                    if (resp.data.Email) {
+                        // Set the cookie state
+                        cookies.set('email', resp.data.Email, {path: '/'}) // so that its visible in all pages
+                        cookies.set('firstname', resp.data.FirstName, {path: '/'})
+                        cookies.set('lastname', resp.data.LastName, {path: '/'})
+                        navigate("/chat")
+                    } else {
+                        alert("Invalid credentials, try again!")
+                    }
+                });        
     }
 
     const ForgotPassword = () => {

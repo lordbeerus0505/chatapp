@@ -7,11 +7,14 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Chat } from './pages/Chat';
+import Cookies from 'universal-cookie';
+
 
 const HOSTNAME = "http://localhost:8080"
+const cookies = new Cookies();
 
 export {
-  Home, Login, Register, Chat, HOSTNAME
+  Home, Login, Register, Chat, HOSTNAME, cookies
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
