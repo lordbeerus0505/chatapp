@@ -9,7 +9,7 @@ export const NewContact = () => {
 
     const makeRequest = async (data) => {
         console.log(data, "is the data sent to submit, validate in the backend")
-        const res = axios.post(HOSTNAME+'/add-contact', {"email": data.mail_id, "firstname": data.firstname, "lastname": data.lastname})
+        const res = axios.post(HOSTNAME+'/add-contact', {"email": data.mail_id, "firstname": data.f_name, "lastname": data.l_name, "user": cookies.get("email")})
             .then(
                 (resp) =>{
                     console.log(resp.data)
@@ -43,8 +43,11 @@ export const ListContacts = () => {
 
     const retrieveContacts = async (data) => {
         console.log(data, "is the data sent to submit, validate in the backend")
-        const res = axios.post(HOSTNAME+'/get-chats', {"email": cookies.get("email")}) // create the backend and have it send back from Dynamo all the data.
-            .then(
+        const res = axios.post(HOSTNAME+'/get-chats', {
+            "email": cookies.get("email"),
+            "firstname": cookies.get("firstname"),
+            "lastname": cookies.get("lastname")
+        }).then(
                 (resp) =>{
                     console.log(resp.data)
                 });

@@ -14,6 +14,7 @@ func main() {
 	src.Login(r)
 	src.Register(r)
 	src.AddContact(r)
+	src.GetChats(r)
 	r.Run()
 
 }
