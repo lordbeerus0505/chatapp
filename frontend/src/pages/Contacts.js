@@ -2,6 +2,7 @@ import { useState, Component, useEffect } from "react"
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { cookies, HOSTNAME } from ".."
+import "../App.css"
 
 export const NewContact = () => {
     const [email, alterEmail] = useState("");
@@ -30,16 +31,12 @@ export const NewContact = () => {
 
 export const ListContacts = () => {
     
-    var contacts = [{
-        "email":"email1@gmail.com",
-        "firstname": "name1",
-        "lastname": "name2"
-    }]
+    var [contacts, setContacts] = useState([])
 
     useEffect(() => {
         // Fetch the contacts
         retrieveContacts();
-    });
+    }, []);
 
     const retrieveContacts = async (data) => {
         console.log(data, "is the data sent to submit, validate in the backend")
@@ -49,20 +46,32 @@ export const ListContacts = () => {
             "lastname": cookies.get("lastname")
         }).then(
                 (resp) =>{
-                    console.log(resp.data)
+                    if (resp.email != "False") {
+                        
+                        setContacts(resp.data.Contacts)
+                    }
+                    console.log(contacts)
                 });
     }
+
+    const retrieveChat = (email) => {
+        console.log(email, 'is the email PK')
+        // Send request to backend to retrieve the conversation between current user (in cookie) and email user
+    }
     return (
-        <div className="contact-list">
-            {
-                contacts.map((data) => {
-                    return (
-                        <div>
-                            <h4>{data.firstname} {data.lastname}</h4>
-                        </div>
-                    )
-                })
-            }
+        <div className="chat-window">
+            <div className="contact-list">
+                {
+                    contacts.map((data) => {
+                        return (
+                            <div >
+                                <button className="chat-names" onClick={() => retrieveChat(data.Email)}>{data.FirstName} {data.LastName}</button>
+                            </div>
+                        )
+                    })
+                }
+            </div>
         </div>
+        
     )
 }
