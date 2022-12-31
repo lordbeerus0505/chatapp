@@ -51,8 +51,8 @@ func GetChats(r *gin.Engine) {
 		fmt.Println(body)
 		// Note, Context.TODO() can only be used in local methods not exported ones (no caps)
 		status, listOfChats := retrieveContacts(body.Email)
-		if status != true {
-			context.JSON(http.StatusBadRequest, false)
+		if !status {
+			context.JSON(http.StatusBadRequest, ContactsList{Email: "False"})
 		} else {
 			context.JSON(http.StatusOK, &listOfChats)
 		}

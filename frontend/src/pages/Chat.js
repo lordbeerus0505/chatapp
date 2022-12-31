@@ -8,11 +8,10 @@ export const Chat = () => {
         toggleStatus(!status)
     }
     return (
-        <div>
-            <h1>Hello {cookies.get('firstname')}</h1>
-            <h1>This is the Chat Page</h1>
-            <h2> Fetching chats...</h2>
-            <button onClick={AddContact}>Add Contact</button>
+        <div className="chat-page">
+            <h3 className="header-text">Hello {cookies.get('firstname')}</h3>
+            <button className="add-contact" onClick={AddContact}>Add Contact</button>
+            <br/><br/>
             {status?<NewContact/>:null}
             {/* List out all the contacts (on click, should open a chat) */}
             <ListContacts/>

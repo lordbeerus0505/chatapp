@@ -36,3 +36,37 @@
     transform: rotate(360deg);
   }
 }
+
+.chat-page {
+  background-color: rgb(38, 39, 68);
+}
+
+.contact-list {
+  width: 10%;
+  height: 80%;
+  color: beige;
+  background-color: rgb(48, 69, 83);
+}
+
+.header-text {
+  color: white;
+  width: 10%;
+  float: right;
+}
+
+.add-contact {
+  background-color: #008CBA;
+  border-radius: 10%;
+  color: whitesmoke;
+  float: right;
+}
+
+.chat-names {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  font-size: medium;
+}
