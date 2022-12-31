@@ -50,8 +50,12 @@ func GetChats(r *gin.Engine) {
 		}
 		fmt.Println(body)
 		// Note, Context.TODO() can only be used in local methods not exported ones (no caps)
-		listOfChats := retrieveContacts(body.Email)
-		context.JSON(http.StatusOK, &listOfChats)
+		status, listOfChats := retrieveContacts(body.Email)
+		if status != true {
+			context.JSON(http.StatusBadRequest, false)
+		} else {
+			context.JSON(http.StatusOK, &listOfChats)
+		}
 
 	})
 }
@@ -65,27 +69,27 @@ func addContactDynamo(contact common.ContactCard) bool {
 	svc := dynamodb.NewFromConfig(cfg)
 	fmt.Println("SVC is", svc)
 	// Retrieve contacts from Dynamo, and then append to the list.
-
-	c := ContactsList{
-		Email: contact.User,
-		Contacts: []common.ContactCard{
-			contact,
-		},
+	var listOfChats ContactsList
+	status, listOfChats := retrieveContacts(contact.User)
+	if !status {
+		listOfChats = ContactsList{
+			Email: contact.User,
+			Contacts: []common.ContactCard{
+				contact,
+			},
+		}
+	} else {
+		listOfChats.Contacts = append(listOfChats.Contacts, contact)
 	}
-	av, err := attributevalue.MarshalMap(c)
-	fmt.Println(av, c)
+
+	av, err := attributevalue.MarshalMap(listOfChats)
+	fmt.Println(av, listOfChats)
 	if err != nil {
 		panic(err)
 	}
 	out, err := svc.PutItem(context.TODO(), &dynamodb.PutItemInput{
 		TableName: aws.String(common.CONTACTS_TABLE),
 		Item:      av,
-		// Item: map[string]types.AttributeValue{
-		// 	"email":        &types.AttributeValueMemberS{Value: contact.User},
-		// 	"firstname":    &types.AttributeValueMemberS{Value: contact.FirstName},
-		// 	"lastname":     &types.AttributeValueMemberS{Value: contact.LastName},
-		// 	"friend_email": &types.AttributeValueMemberS{Value: contact.Email},
-		// },
 	})
 	fmt.Println(out)
 	if err != nil {
@@ -116,7 +120,7 @@ func userExists(email string) bool {
 
 }
 
-func retrieveContacts(email string) bool {
+func retrieveContacts(email string) (bool, ContactsList) {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), func(o *config.LoadOptions) error {
 		o.Region = common.DYNAMOREGION
 		return nil
@@ -143,5 +147,8 @@ func retrieveContacts(email string) bool {
 		panic(err)
 	}
 	fmt.Println("Items in Dynamo are", contacts)
-	return true
+	if len(contacts) != 1 {
+		return false, ContactsList{}
+	}
+	return true, contacts[0]
 }
